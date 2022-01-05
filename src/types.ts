@@ -1,8 +1,8 @@
 import { DeerRequest } from "./classes/DeerRequest.ts";
-import { Path } from "./classes/Path.ts";
+import { TemplatePath } from "./classes/Path.ts";
 
 export interface Handle {
-  path: Path;
+  path: TemplatePath;
   method: HTTPMethod;
   handler: Handler;
 }

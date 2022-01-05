@@ -1,60 +1,57 @@
 import { Router } from "./Router.ts";
 import { DeerRequest } from "./DeerRequest.ts";
-import { Handle, HTTPMethod, Handler, Param } from "../types.ts";
-import { Path } from "./Path.ts";
+import { Handle, HTTPMethod, Handler } from "../types.ts";
+import { TemplatePath, Path } from "./Path.ts";
 
 import { serve } from "../dep.ts";
 
 export class App {
   private possibleRequests: Handle[] = [];
 
-  private use = (path: Path, method: HTTPMethod, handler: Handler) => {
+  private use = (path: TemplatePath, method: HTTPMethod, handler: Handler) => {
     this.possibleRequests.push({ path, method, handler });
   };
 
   public get = (path: string, handler: Handler) =>
-    this.use(new Path(path), "GET", handler);
+    this.use(new TemplatePath(path), "GET", handler);
   public post = (path: string, handler: Handler) =>
-    this.use(new Path(path), "POST", handler);
+    this.use(new TemplatePath(path), "POST", handler);
   public put = (path: string, handler: Handler) =>
-    this.use(new Path(path), "PUT", handler);
+    this.use(new TemplatePath(path), "PUT", handler);
   public delete = (path: string, handler: Handler) =>
-    this.use(new Path(path), "DELETE", handler);
+    this.use(new TemplatePath(path), "DELETE", handler);
 
   private handle = (req: Request): Response | Promise<Response> => {
-    const pathname = new URL(req.url).pathname;
+    const pathname = Path.fromFullURI(req.url);
 
-    const currentRequest = this.possibleRequests.find(({ path }) =>
-      pathname.startsWith(path.raw)
-    );
-
+    const currentRequest = this.getRequestHandler(pathname, req.method);
     if (!currentRequest) return new Response("Not found", { status: 404 });
 
-    const { path } = currentRequest;
-    const params: { [key: string]: Param } = {};
+    return currentRequest.handler(
+      new DeerRequest(req, currentRequest.path, pathname)
+    );
+  };
 
-    path.splitted.forEach((potentialParam: string, index: number) => {
-      if (potentialParam.startsWith(":")) {
-        params[potentialParam.slice(1)] = {
-          param: new Path(pathname).splitted[index],
-          index,
-        };
-      }
+  private getRequestHandler = (pathname: TemplatePath, currentMethod: string) =>
+    this.possibleRequests.find(
+      ({ path, method }) =>
+        method === currentMethod &&
+        path.splitted.every(
+          (part, index) =>
+            part.startsWith(":") || part === pathname.splitted[index]
+        )
+    );
+
+  public route = (path: string, router: Router) => {
+    const routePath = new TemplatePath(path);
+
+    router.connect().forEach(({ path, method, handler }) => {
+      this.use(routePath.add(path), method, handler);
     });
-
-    return currentRequest.handler(new DeerRequest(req, params));
   };
 
   public listen = (port: number) => {
     console.log(`serving on http://localhost:${port}/`);
     serve(this.handle, { port });
-  };
-
-  public route = (path: string, router: Router) => {
-    const routePath = new Path(path);
-
-    router.connect().forEach(({ path, method, handler }) => {
-      this.use(routePath.add(path), method, handler);
-    });
   };
 }
