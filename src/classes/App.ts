@@ -1,4 +1,4 @@
-import { response } from "./response.ts";
+import { response } from "../services/response.ts";
 import { Router } from "./Router.ts";
 import { DeerRequest } from "./DeerRequest.ts";
 import { Handle, HTTPMethod, Handler } from "../types.ts";
