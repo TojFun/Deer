@@ -2,7 +2,7 @@ import { response } from "../services/response.ts";
 import { Router } from "./Router.ts";
 import { DeerRequest } from "./DeerRequest.ts";
 import { Handle, HTTPMethod, Handler } from "../types.ts";
-import { TemplatePath, Path } from "./Path.ts";
+import { TemplatePath, Path } from "../Path.ts";
 
 import { serve } from "../dep.ts";
 

@@ -1,4 +1,4 @@
-import { TemplatePath, Path } from "./Path.ts";
+import { TemplatePath, Path } from "../Path.ts";
 
 export class DeerRequest extends Request {
   private template: TemplatePath;

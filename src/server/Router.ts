@@ -1,4 +1,4 @@
-import { TemplatePath } from "./Path.ts";
+import { TemplatePath } from "../Path.ts";
 import { Handle, Handler, HTTPMethod } from "../types.ts";
 
 export class Router {

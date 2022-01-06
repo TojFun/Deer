@@ -1,5 +1,5 @@
-import { DeerRequest } from "./classes/DeerRequest.ts";
-import { TemplatePath } from "./classes/Path.ts";
+import { DeerRequest } from "./server/DeerRequest.ts";
+import { TemplatePath } from "./Path.ts";
 
 export interface Handle {
   path: TemplatePath;
