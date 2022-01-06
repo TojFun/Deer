@@ -3,9 +3,9 @@ import { TemplatePath, Path } from "./Path.ts";
 export class DeerRequest extends Request {
   private template: TemplatePath;
   private actualPath: Path;
+  private _params: { [key: string]: string } = {};
 
   uri: URL;
-  private _params: { [key: string]: string } = {};
 
   constructor(
     request: Request,

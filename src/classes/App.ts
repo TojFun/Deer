@@ -9,6 +9,7 @@ import { serve } from "../dep.ts";
 export class App {
   private possibleRequests: Handle[] = [];
 
+  // use functions:
   private use = (path: TemplatePath, method: HTTPMethod, handler: Handler) => {
     this.possibleRequests.push({ path, method, handler });
   };
@@ -22,6 +23,20 @@ export class App {
   public delete = (path: string, handler: Handler) =>
     this.use(new TemplatePath(path), "DELETE", handler);
 
+  // TODO: add middleware support
+  // middleware functions:
+
+  // TODO: Add support for sub-routers
+  // connects a router to the app:
+  public route = (path: string, router: Router) => {
+    const routePath = new TemplatePath(path);
+
+    router.connect().forEach(({ path, method, handler }) => {
+      this.use(routePath.add(path), method, handler);
+    });
+  };
+
+  // listen functionality:
   private handle = (req: Request): Response | Promise<Response> => {
     const pathname = Path.fromFullURI(req.url);
 
@@ -34,6 +49,12 @@ export class App {
     );
   };
 
+  public listen = (port: number) => {
+    console.log(`serving on http://localhost:${port}/`);
+    serve(this.handle, { port });
+  };
+
+  // util functions:
   private getRequestHandler = (pathname: TemplatePath, currentMethod: string) =>
     this.possibleRequests.find(
       ({ path, method }) =>
@@ -43,17 +64,4 @@ export class App {
             part.startsWith(":") || part === pathname.splitted[index]
         )
     );
-
-  public route = (path: string, router: Router) => {
-    const routePath = new TemplatePath(path);
-
-    router.connect().forEach(({ path, method, handler }) => {
-      this.use(routePath.add(path), method, handler);
-    });
-  };
-
-  public listen = (port: number) => {
-    console.log(`serving on http://localhost:${port}/`);
-    serve(this.handle, { port });
-  };
 }
