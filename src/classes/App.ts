@@ -1,3 +1,4 @@
+import { response } from "./response.ts";
 import { Router } from "./Router.ts";
 import { DeerRequest } from "./DeerRequest.ts";
 import { Handle, HTTPMethod, Handler } from "../types.ts";
@@ -28,7 +29,8 @@ export class App {
     if (!currentRequest) return new Response("Not found", { status: 404 });
 
     return currentRequest.handler(
-      new DeerRequest(req, currentRequest.path, pathname)
+      new DeerRequest(req, currentRequest.path, pathname),
+      response
     );
   };
 

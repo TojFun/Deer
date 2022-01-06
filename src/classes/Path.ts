@@ -20,10 +20,6 @@ export class TemplatePath {
     return new TemplatePath(this.raw + path.raw);
   }
 
-  static fromFullURI(url: string) {
-    return new TemplatePath(new URL(url).pathname);
-  }
-
   private validate() {
     if (!this.raw.startsWith("/")) throw new Error("A path must start with /");
 
@@ -48,5 +44,9 @@ export class Path extends TemplatePath {
       if (path.match(/:/))
         throw new Error(`A path can't have ":"s. The path ${path} is invalid.`);
     });
+  }
+
+  static fromFullURI(url: string) {
+    return new Path(new URL(url).pathname);
   }
 }

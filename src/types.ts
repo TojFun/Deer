@@ -14,4 +14,20 @@ export interface Param {
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE";
 
-export type Handler = (req: DeerRequest) => Response | Promise<Response>;
+export type Handler = (
+  req: DeerRequest,
+  res: ResponseFunction
+) => Response | Promise<Response>;
+
+type ResponseBody = string | Record<string, unknown>;
+
+interface ResponseInit {
+  headers?: Headers;
+  status?: number;
+  statusText?: string;
+}
+
+export type ResponseFunction = (
+  body: ResponseBody,
+  init?: ResponseInit
+) => Response;
